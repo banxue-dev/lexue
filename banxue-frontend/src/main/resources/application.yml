@@ -1,0 +1,15 @@
+#mybatis-plus
+mybatis-plus:
+   mapper-locations: com/banxue/*/mapper/xml/*.xml
+   type-aliases-package: com.banxue.*.entity
+spring:
+   jackson:
+      time-zone: GMT+8
+      date-format: yyyy-MM-dd HH:mm:ss
+   profiles:
+      active: dev
+# server
+server:
+    port: 8084
+data:
+   name: 21
