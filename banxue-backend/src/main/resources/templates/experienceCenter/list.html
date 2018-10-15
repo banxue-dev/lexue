@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>体验中心管理 列表</title>
+    <link href="/layui/css/layui.css" rel="stylesheet"/>
+    <script src="/layui/layui.js"></script>
+</head>
+
+<body>
+<!-- 搜索栏 -->
+<!-- <form id="searchForm" class="layui-form" action="" lay-filter="searchForm">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">账号:</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" id="loginName" name="loginName" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="search"><i class="layui-icon layui-icon-search"></i>查询</button>
+            <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+        </div>
+    </div>
+</form> -->
+
+<!-- table -->
+<table id="lay_table" class="layui-hide" lay-filter="tbf"></table>
+
+<!-- 头工具栏toolbar -->
+<script type="text/html" id="toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-1"></i>新增</button>
+    </div>
+</script>
+
+<!-- 工具条tool -->
+<script type="text/html" id="tool">
+	{{#  if(d.centerState === 1){ }}
+    		<input type="checkbox" checked name="centerState" value="{{ d.centerState }}" lay-skin="switch" lay-text="上线|禁用" lay-filter="status">
+    {{#  } else { }}
+    		<input type="checkbox" name="centerState" value="{{ d.centerState }}" lay-skin="switch" lay-text="上线|禁用" lay-filter="status">
+    {{#  } }}
+    <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>查看</a>
+</script>
+
+<!-- 状态templet -->
+<script type="text/html" id="statusTemp">
+	{{#  if(d.centerState === 0){ }}
+    	上线
+    {{#  } else { }}
+		禁用
+    {{#  } }}
+</script>
+
+<script type="text/javascript">
+    layui.config({
+        base: '/layui/base/'
+    }).use(['table', 'form', 'baselist'], function () {
+        var table = layui.table,
+            form = layui.form,
+            baselist = layui.baselist;
+
+        // 查询
+        baselist.querySubmit();
+
+        // 渲染表格
+        baselist.renderTable({
+            title: '账号',
+            url: '/experienceCenter/list',
+            cols: [
+	            	[
+	                {type: 'numbers'},
+	                {field: 'centerNo', title: 'ID', align: 'center'},
+	                {field: 'centerName', title: '名称', align: 'center'},
+	                {field: 'centerArea', title: '地区', align: 'center'},
+	                {field: 'centerState', title: '状态', align: 'center', templet: '#statusTemp'},
+	                {title: '操作', width: '150', align: 'center', toolbar: '#tool'}
+	            	]
+            	]
+        });
+
+        table.on('toolbar(tbf)', function (obj) {
+            switch (obj.event) {
+                case 'add':
+                    baselist.createRow({
+                        title: '新增账号',
+                        content: '/user/add',
+                        area: ['380px', '400px'],
+                    });
+                    break;
+            }
+        });
+
+        table.on('tool(tbf)', function (obj) {
+            var record = obj.data;
+            switch (obj.event) {
+                case 'edit':
+                    baselist.updateRow({
+                        title: '编辑账号',
+                        content: '/user/update',
+                        area: ['380px', '400px'],
+                    }, record);
+                    break;
+            }
+        });
+
+        // 监听switch开关: 状态status
+        form.on('switch(status)', function (data) {
+            var record = {};
+            record.id = data.value;
+            if (data.elem.checked) {
+                record.status = 1;
+            } else {
+                record.status = 0;
+            }
+
+            baselist.ajaxPost("/user/update", record);
+        });
+    });
+</script>
+</body>
+</html>

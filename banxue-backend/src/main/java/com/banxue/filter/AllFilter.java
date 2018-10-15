@@ -11,7 +11,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.springframework.context.annotation.Configuration;
+
+import com.banxue.utils.Constants;
 import com.banxue.utils.log.FileLog;
 
 /**
@@ -20,6 +24,7 @@ import com.banxue.utils.log.FileLog;
 文件：AllFilter.java
 项目：banxue-interface
 */
+@Configuration
 @WebFilter(filterName="myFilter",urlPatterns="/*")
 public class AllFilter implements Filter {
 
@@ -36,8 +41,31 @@ public class AllFilter implements Filter {
 		 HttpServletRequest request = (HttpServletRequest) servletRequest;
 	     HttpServletResponse response = (HttpServletResponse) servletResponse;
 	     FileLog.debugLog("经过了过滤器");
+	     //检查用户是否登录
+	     checkLogin(request, response);
 	     filterChain.doFilter(request, response);
+	}
 
+	/**
+	 * 检查用户登录
+	 * @param request
+	 * @param response
+	 * @throws IOException 
+	 */
+	private void checkLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String url = request.getRequestURL().toString();
+		System.err.println(url);
+		
+		if (url.contains("login")) {
+			return;
+		}
+		
+		// 检查用户是否登录
+		HttpSession session = request.getSession();
+        if (session.getAttribute(Constants.SESSION_KEY) == null) {
+        	url = "/login";
+        	response.sendRedirect(url);
+        }
 	}
 
 	@Override
